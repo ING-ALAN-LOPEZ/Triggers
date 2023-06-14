@@ -1,0 +1,45 @@
+create or replace trigger tr_acciones_tb_a
+after insert or update or delete
+on tb_a
+for each row
+declare
+    descripcion varchar2(50);
+begin
+    if inserting then
+        descripcion := 'se ha insertado un dato';
+    elsif updating then
+        descripcion := 'se ha actualizado un dato ';
+    elsif deleting then
+        descripcion := 'se ha eliminado un dato';
+    end if;
+    
+    insert into tb_b (descripcion, fecha_1) values (descripcion, 'null');
+end tr_acciones_tb_a;
+
+Create or replace Trigger tr_insertar_fecha_tiendita
+ after insert 
+ on tb_a
+ for each row
+ declare 
+ v_fecha_hora timestamp;
+ begin
+ IF SUBSTR(:new.nombre,1,1) = 'd' then  
+    select systimestamp into v_fecha_hora from dual; 
+    insert into tb_b 
+    values ('se agregó un producto y que su nombre empieza con d’', v_fecha_hora );
+    END IF;
+ end tr_insertar_fecha_tiendita;
+
+Create or replace Trigger tr_eliminar_producto_humilde
+ after delete 
+ on tb_a
+ for each row
+ declare 
+ v_fecha_hora timestamp;
+ begin
+ IF (:OLD.valor <= 12) THEN
+    select systimestamp into v_fecha_hora from dual; 
+    INSERT INTO tb_b VALUES 
+    ('se eliminó un producto humilde que quería comprar con lo que tenia de mi pasaje :,c',v_fecha_hora);
+  END IF;
+END tr_eliminar_producto_humilde;
